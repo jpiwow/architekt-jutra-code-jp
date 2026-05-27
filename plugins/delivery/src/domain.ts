@@ -105,7 +105,7 @@ export function validatePrice(amount: number): ValidationResult {
   return { valid: true };
 }
 
-export function isNameDuplicate(name: string, existingNames: string[], excludeId?: string): boolean {
+export function isNameDuplicate(name: string, existingNames: string[], _excludeId?: string): boolean {
   const normalizedName = name.toLowerCase().trim();
   return existingNames.some(existing => existing.toLowerCase().trim() === normalizedName);
 }
@@ -115,43 +115,43 @@ export function isNameDuplicate(name: string, existingNames: string[], excludeId
 export function toCourier(obj: PluginObject): Courier {
   return {
     objectId: obj.objectId,
-    name: obj.data.name,
-    trackingUrlTemplate: obj.data.trackingUrlTemplate,
+    name: obj.data.name as string,
+    trackingUrlTemplate: obj.data.trackingUrlTemplate as string,
   };
 }
 
 export function toDeliveryType(obj: PluginObject): DeliveryType {
   return {
     objectId: obj.objectId,
-    name: obj.data.name,
+    name: obj.data.name as string,
   };
 }
 
 export function toDeliveryMethod(obj: PluginObject): DeliveryMethod {
   return {
     objectId: obj.objectId,
-    courierId: obj.data.courierId,
-    deliveryTypeId: obj.data.deliveryTypeId,
-    courierName: obj.data.courierName,
-    deliveryTypeName: obj.data.deliveryTypeName,
+    courierId: obj.data.courierId as string,
+    deliveryTypeId: obj.data.deliveryTypeId as string,
+    courierName: obj.data.courierName as string,
+    deliveryTypeName: obj.data.deliveryTypeName as string,
   };
 }
 
 export function toPriceEntry(obj: PluginObject): PriceEntry {
   return {
     objectId: obj.objectId,
-    deliveryMethodId: obj.data.deliveryMethodId,
-    sizeCategory: obj.data.sizeCategory,
-    amount: obj.data.amount,
-    currency: obj.data.currency,
+    deliveryMethodId: obj.data.deliveryMethodId as string,
+    sizeCategory: obj.data.sizeCategory as SizeCategory,
+    amount: obj.data.amount as number,
+    currency: obj.data.currency as string,
   };
 }
 
 export function toAssignment(obj: PluginObject): ProductDeliveryAssignment {
   return {
     objectId: obj.objectId,
-    productId: obj.data.productId,
-    deliveryMethodId: obj.data.deliveryMethodId,
+    productId: obj.data.productId as string,
+    deliveryMethodId: obj.data.deliveryMethodId as string,
   };
 }
 

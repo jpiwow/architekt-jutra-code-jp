@@ -12,7 +12,6 @@ import {
   updateCourier,
   listCouriers,
   createDeliveryType,
-  updateDeliveryType,
   listDeliveryTypes,
   createDeliveryMethod,
   listDeliveryMethods,
