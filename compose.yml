@@ -17,6 +17,7 @@ services:
       start_period: 30s
 
   langfuse-db:
+    profiles: ["ai"]
     labels:
       org.springframework.boot.ignore: "true"
     image: 'postgres:18'
@@ -36,6 +37,7 @@ services:
       start_period: 30s
 
   clickhouse:
+    profiles: ["ai"]
     labels:
       org.springframework.boot.ignore: "true"
     image: clickhouse/clickhouse-server:latest
@@ -59,6 +61,7 @@ services:
         hard: 262144
 
   minio:
+    profiles: ["ai"]
     labels:
       org.springframework.boot.ignore: "true"
     image: minio/minio:latest
@@ -79,6 +82,7 @@ services:
       start_period: 10s
 
   minio-setup:
+    profiles: ["ai"]
     labels:
       org.springframework.boot.ignore: "true"
     image: minio/mc:latest
@@ -93,6 +97,7 @@ services:
       "
 
   redis:
+    profiles: ["ai"]
     labels:
       org.springframework.boot.ignore: "true"
     image: redis:7
@@ -106,6 +111,7 @@ services:
       start_period: 10s
 
   langfuse:
+    profiles: ["ai"]
     labels:
       org.springframework.boot.ignore: "true"
     image: langfuse/langfuse:latest
@@ -156,6 +162,7 @@ services:
       start_period: 120s
 
   langfuse-worker:
+    profiles: ["ai"]
     labels:
       org.springframework.boot.ignore: "true"
     image: langfuse/langfuse-worker:latest
@@ -167,6 +174,7 @@ services:
     restart: unless-stopped
 
   presidio-analyzer:
+    profiles: ["ai"]
     labels:
       org.springframework.boot.ignore: "true"
     image: mcr.microsoft.com/presidio-analyzer:latest
@@ -180,6 +188,7 @@ services:
       start_period: 120s
 
   presidio-anonymizer:
+    profiles: ["ai"]
     labels:
       org.springframework.boot.ignore: "true"
     image: mcr.microsoft.com/presidio-anonymizer:latest
@@ -193,6 +202,7 @@ services:
       start_period: 120s
 
   litellm-db:
+    profiles: ["ai"]
     labels:
       org.springframework.boot.ignore: "true"
     image: 'postgres:18'
@@ -212,6 +222,7 @@ services:
       start_period: 30s
 
   litellm:
+    profiles: ["ai"]
     labels:
       org.springframework.boot.ignore: "true"
     image: ghcr.io/berriai/litellm:main-stable
