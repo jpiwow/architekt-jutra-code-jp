@@ -1,0 +1,27 @@
+{
+  "name": "Delivery",
+  "version": "1.0.0",
+  "url": "http://localhost:3010",
+  "description": "Manages couriers, delivery types, delivery methods, pricing, and per-product delivery assignments",
+  "extensionPoints": [
+    {
+      "type": "menu.main",
+      "label": "Delivery",
+      "icon": "delivery",
+      "path": "/",
+      "priority": 100
+    },
+    {
+      "type": "product.detail.tabs",
+      "label": "Delivery",
+      "path": "/product-delivery",
+      "priority": 50
+    },
+    {
+      "type": "product.detail.info",
+      "label": "Delivery",
+      "path": "/product-delivery-badge",
+      "priority": 10
+    }
+  ]
+}
