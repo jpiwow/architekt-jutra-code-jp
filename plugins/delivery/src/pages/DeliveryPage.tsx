@@ -4,10 +4,13 @@ import {
   updateCourier,
   listCouriers,
   deleteCourier,
+  createDeliveryType,
+  updateDeliveryType,
+  listDeliveryTypes,
+  deleteDeliveryType,
   createDeliveryMethod,
   listDeliveryMethods,
   deleteDeliveryMethod,
-  listDeliveryTypes,
   getCascadeImpact,
   savePrice,
   listPrices,
@@ -15,6 +18,7 @@ import {
 import {
   validateCourierName,
   validateTrackingUrlTemplate,
+  validateDeliveryTypeName,
   validatePrice,
   isNameDuplicate,
 } from "../domain";
@@ -25,6 +29,7 @@ export function DeliveryPage() {
     <div className="tc-plugin" style={{ padding: "1rem", maxWidth: 900 }}>
       <h1>Delivery Management</h1>
       <CouriersSection />
+      <DeliveryTypesSection />
       <DeliveryMethodsSection />
     </div>
   );
@@ -324,6 +329,291 @@ function CouriersSection() {
             <p>
               Are you sure you want to delete courier{" "}
               <strong>{deleteConfirm.courierName}</strong>?
+            </p>
+            {(deleteConfirm.impact.deliveryMethodCount > 0 ||
+              deleteConfirm.impact.assignmentCount > 0 ||
+              deleteConfirm.impact.priceEntryCount > 0) && (
+              <>
+                <p>This will also remove:</p>
+                <ul>
+                  {deleteConfirm.impact.deliveryMethodCount > 0 && (
+                    <li>{deleteConfirm.impact.deliveryMethodCount} delivery method(s)</li>
+                  )}
+                  {deleteConfirm.impact.assignmentCount > 0 && (
+                    <li>{deleteConfirm.impact.assignmentCount} product assignment(s)</li>
+                  )}
+                  {deleteConfirm.impact.priceEntryCount > 0 && (
+                    <li>{deleteConfirm.impact.priceEntryCount} price entry/entries</li>
+                  )}
+                </ul>
+              </>
+            )}
+            <div className="tc-flex" style={{ gap: "0.5rem", marginTop: "1rem" }}>
+              <button
+                className="tc-ghost-button tc-ghost-button--danger"
+                onClick={() => void confirmDelete()}
+              >
+                Delete
+              </button>
+              <button className="tc-ghost-button" onClick={cancelDelete}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
+
+// --- Delivery Types Section ---
+
+function DeliveryTypesSection() {
+  const [deliveryTypes, setDeliveryTypes] = useState<DeliveryType[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Create form state
+  const [newName, setNewName] = useState("");
+  const [createError, setCreateError] = useState<string | null>(null);
+
+  // Edit state
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editError, setEditError] = useState<string | null>(null);
+
+  // Delete confirmation state
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    typeId: string;
+    typeName: string;
+    impact: CascadeImpact;
+  } | null>(null);
+
+  const loadTypes = useCallback(async () => {
+    try {
+      const data = await listDeliveryTypes();
+      setDeliveryTypes(data);
+    } catch (err) {
+      console.error("Failed to load delivery types:", err);
+      setError(err instanceof Error ? err.message : "Failed to load delivery types");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadTypes();
+  }, [loadTypes]);
+
+  async function handleCreate() {
+    setCreateError(null);
+    setError(null);
+
+    const nameResult = validateDeliveryTypeName(newName);
+    if (!nameResult.valid) {
+      setCreateError(nameResult.error ?? "Invalid name");
+      return;
+    }
+
+    if (isNameDuplicate(newName, deliveryTypes.map((dt) => dt.name))) {
+      setCreateError("A delivery type with this name already exists");
+      return;
+    }
+
+    try {
+      await createDeliveryType(newName.trim());
+      setNewName("");
+      setCreateError(null);
+      await loadTypes();
+    } catch (err) {
+      console.error("Failed to create delivery type:", err);
+      setError(err instanceof Error ? err.message : "Failed to create delivery type");
+    }
+  }
+
+  function startEdit(dt: DeliveryType) {
+    setEditingId(dt.objectId);
+    setEditName(dt.name);
+    setEditError(null);
+  }
+
+  function cancelEdit() {
+    setEditingId(null);
+    setEditName("");
+    setEditError(null);
+  }
+
+  async function handleUpdate() {
+    if (!editingId) return;
+    setEditError(null);
+    setError(null);
+
+    const nameResult = validateDeliveryTypeName(editName);
+    if (!nameResult.valid) {
+      setEditError(nameResult.error ?? "Invalid name");
+      return;
+    }
+
+    const otherNames = deliveryTypes
+      .filter((dt) => dt.objectId !== editingId)
+      .map((dt) => dt.name);
+    if (isNameDuplicate(editName, otherNames)) {
+      setEditError("A delivery type with this name already exists");
+      return;
+    }
+
+    try {
+      await updateDeliveryType(editingId, editName.trim());
+      cancelEdit();
+      await loadTypes();
+    } catch (err) {
+      console.error("Failed to update delivery type:", err);
+      setError(err instanceof Error ? err.message : "Failed to update delivery type");
+    }
+  }
+
+  async function handleDeleteClick(dt: DeliveryType) {
+    setError(null);
+    try {
+      const impact = await getCascadeImpact("deliveryType", dt.objectId);
+      setDeleteConfirm({
+        typeId: dt.objectId,
+        typeName: dt.name,
+        impact,
+      });
+    } catch (err) {
+      console.error("Failed to check deletion impact:", err);
+      setError(err instanceof Error ? err.message : "Failed to check deletion impact");
+    }
+  }
+
+  async function confirmDelete() {
+    if (!deleteConfirm) return;
+    setError(null);
+    try {
+      await deleteDeliveryType(deleteConfirm.typeId);
+      setDeleteConfirm(null);
+      await loadTypes();
+    } catch (err) {
+      console.error("Failed to delete delivery type:", err);
+      setError(
+        err instanceof Error ? err.message : "Failed to delete delivery type. All changes have been rolled back."
+      );
+      setDeleteConfirm(null);
+    }
+  }
+
+  function cancelDelete() {
+    setDeleteConfirm(null);
+  }
+
+  if (loading) return <p>Loading...</p>;
+
+  return (
+    <section className="tc-section">
+      <h2>Delivery Types</h2>
+      {error && <p className="tc-error">{error}</p>}
+
+      {/* Create form */}
+      <div style={{ marginBottom: "1rem" }}>
+        <div className="tc-flex" style={{ marginBottom: "0.25rem", gap: "0.5rem" }}>
+          <input
+            className="tc-input"
+            placeholder="Delivery type name"
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+          />
+          <button className="tc-primary-button" onClick={() => void handleCreate()}>
+            Add
+          </button>
+        </div>
+        {createError && <p className="tc-error">{createError}</p>}
+      </div>
+
+      {/* Delivery types list */}
+      {deliveryTypes.length === 0 ? (
+        <p>No delivery types configured yet. Add one above.</p>
+      ) : (
+        <table className="tc-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {deliveryTypes.map((dt) =>
+              editingId === dt.objectId ? (
+                <tr key={dt.objectId}>
+                  <td>
+                    <input
+                      className="tc-input"
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                    />
+                    {editError && <p className="tc-error">{editError}</p>}
+                  </td>
+                  <td>
+                    <button className="tc-primary-button" onClick={() => void handleUpdate()}>
+                      Save
+                    </button>
+                    <button className="tc-ghost-button" onClick={cancelEdit}>
+                      Cancel
+                    </button>
+                  </td>
+                </tr>
+              ) : (
+                <tr key={dt.objectId}>
+                  <td>{dt.name}</td>
+                  <td>
+                    <button className="tc-ghost-button" onClick={() => startEdit(dt)}>
+                      Edit
+                    </button>
+                    <button
+                      className="tc-ghost-button tc-ghost-button--danger"
+                      onClick={() => void handleDeleteClick(dt)}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ),
+            )}
+          </tbody>
+        </table>
+      )}
+
+      {/* Delete confirmation dialog */}
+      {deleteConfirm && (
+        <div
+          className="tc-modal-overlay"
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "rgba(0,0,0,0.4)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+          }}
+        >
+          <div
+            className="tc-modal"
+            style={{
+              background: "white",
+              padding: "1.5rem",
+              borderRadius: "8px",
+              maxWidth: 450,
+            }}
+          >
+            <h3>Confirm Deletion</h3>
+            <p>
+              Are you sure you want to delete delivery type{" "}
+              <strong>{deleteConfirm.typeName}</strong>?
             </p>
             {(deleteConfirm.impact.deliveryMethodCount > 0 ||
               deleteConfirm.impact.assignmentCount > 0 ||

@@ -7,7 +7,7 @@
     {
       "type": "menu.main",
       "label": "Delivery",
-      "icon": "delivery",
+      "icon": "truck",
       "path": "/",
       "priority": 100
     },
