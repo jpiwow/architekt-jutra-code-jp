@@ -28,6 +28,7 @@ export function PluginPageRoute() {
   return (
     <Box h="100%" minH="calc(100vh - 120px)">
       <PluginFrame
+        key={plugin.id}
         pluginId={plugin.id}
         pluginName={plugin.name}
         pluginUrl={plugin.url}
