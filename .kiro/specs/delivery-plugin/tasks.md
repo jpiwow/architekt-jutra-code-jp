@@ -181,34 +181,34 @@ Implement the Delivery Plugin as a standalone Vite/React frontend plugin (port 3
     - Test error state display
     - _Requirements: 6.1, 6.2, 6.3, 6.5_
 
-- [-] 9. Checkpoint - Ensure all components render and tests pass
+- [x] 9. Checkpoint - Ensure all components render and tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 10. Property-based tests for round-trip and cascade properties
-  - [-] 10.1 Write property tests for CRUD round-trips (Properties 1, 2, 6)
+- [x] 10. Property-based tests for round-trip and cascade properties
+  - [x] 10.1 Write property tests for CRUD round-trips (Properties 1, 2, 6)
     - **Property 1: Courier CRUD Round-Trip** — create courier with valid name/template, list includes it
     - **Property 2: Delivery Type CRUD Round-Trip** — create delivery type with valid name, list includes it
     - **Property 6: Delivery Method Composition Round-Trip** — create method with valid courier+type IDs, list includes it
     - **Validates: Requirements 1.3, 1.6, 2.2, 2.6, 3.1**
 
-  - [-] 10.2 Write property test for duplicate method rejection (Property 7)
+  - [x] 10.2 Write property test for duplicate method rejection (Property 7)
     - **Property 7: Delivery Method Duplicate Combination Rejection** — creating same courier+type pair twice is rejected
     - **Validates: Requirements 3.2**
 
-  - [-] 10.3 Write property tests for price and assignment round-trips (Properties 9, 11, 12)
+  - [x] 10.3 Write property tests for price and assignment round-trips (Properties 9, 11, 12)
     - **Property 9: Price Entry Upsert Round-Trip** — save price, retrieve matches; save again overwrites
     - **Property 11: Assignment Toggle Round-Trip** — enable then list includes; disable then list excludes
     - **Property 12: Enable All Idempotence** — enable all twice produces same state
     - **Validates: Requirements 4.3, 4.7, 5.2, 5.3, 5.4**
 
-  - [-] 10.4 Write property tests for cascade and badge (Properties 13, 14, 15, 16)
+  - [x] 10.4 Write property tests for cascade and badge (Properties 13, 14, 15, 16)
     - **Property 13: Cascade Deletion Integrity** — after cascade, no orphaned methods/prices/assignments
     - **Property 14: Cascade Confirmation Count Accuracy** — impact counts match actual dependent objects
     - **Property 15: Cancel Abort Preserves State** — cancel leaves all records unchanged
     - **Property 16: Badge Count Accuracy** — badge count equals number of assignments
     - **Validates: Requirements 5.7, 5.8, 6.1, 8.1, 8.2, 8.3, 8.4, 8.5, 8.6**
 
-- [~] 11. Final checkpoint - Full integration verification
+- [x] 11. Final checkpoint - Full integration verification
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes
